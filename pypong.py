@@ -182,7 +182,7 @@ def the_end(winner):
                     score_right = 0
                     bounces = 0
                     waiting = False
-                    main_menu()
+                    return
         clock.tick(60)
 
 # Game Loop 
@@ -236,9 +236,11 @@ def game_loop():
 
         if score_left >= points_to_win and score_left > score_right:
             winner = "Left"
+            running = False
             the_end(winner)
         elif score_right >= points_to_win and score_right > score_left:
             winner = "Right"
+            running = False
             the_end(winner)
         
 
@@ -360,8 +362,8 @@ def game_loop():
         draw_bounces()
 
         pygame.display.flip()
+    return
 
-    pygame.quit()
-
-main_menu()
-game_loop()
+while True:
+    main_menu()
+    game_loop()
