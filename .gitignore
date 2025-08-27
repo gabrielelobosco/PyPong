@@ -2,3 +2,8 @@
 .venv/
 # Ignore VSCode configs
 .vscode/
+# Ignore pyinstaller files
+build/
+dist/
+pypong.rar
+pypong.spec

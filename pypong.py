@@ -8,7 +8,7 @@ import math
 
 pygame.init()
 pygame.display.set_caption("PyPong - A game by: gabrielelobosco")
-pygame.display.set_icon(pygame.image.load("icons/PyGame_icon.png"))
+pygame.display.set_icon(pygame.image.load("icons/pypong_icon.png"))
 
 # Variables
 
