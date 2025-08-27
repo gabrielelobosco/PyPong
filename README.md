@@ -27,6 +27,8 @@ To run the game locally, you need to have Python and Pygame installed.
    python pypong.py
   ```
 
+Alternatively, you can download the ![latest release](https://github.com/gabrielelobosco/PyPong/releases/tag/v1.0.0) (Windows only) and run the executable directly.
+
 ## Gameplay Instructions
 Use Up and Down arrow keys to select your preferred mode
 
@@ -43,7 +45,7 @@ Resume the game: Press Esc again to unpause or Space to continue after scoring.
 ## Customization
 
 You can modify the game by changing the paddle size, ball speed, or winning score by editing the corresponding variables in the pypong.py file.
--- Cooming Soon: In-Game Options --
+-- Coming Soon: In-Game Options --
 
 ## License
 
@@ -58,3 +60,7 @@ PongBlipF4.wav by NoiseCollector -- https://freesound.org/s/4359/ -- License: At
 Videogame Menu Select by Fupicat -- https://freesound.org/s/471937/ -- License: Creative Commons 0
 
 Short Explosion 1 by AceOfSpadesProduc100 -- https://freesound.org/s/334266/ -- License: Attribution 4.0
+
+## Contributors
+
+- 🎨 Game icon (pixelart): [@ilariablasi](https://github.com/ilariablasi)
