@@ -168,7 +168,7 @@ def the_end(winner):
         screen.fill("black")
         title = title_font.render("The End!", True, "white")
         msg = msg_font.render(winner + " wins!", True, "white")
-        sub_msg = msg_font.render("Press space to restart or enter to quit!", True, "white")
+        sub_msg = msg_font.render("Press space to restart or q to quit!", True, "white")
         screen.blit(title, (screen.get_width() / 2 - title.get_width() / 2, screen.get_height() / 2 - title.get_height() / 2 - msg.get_height() / 2))
         screen.blit(msg, (screen.get_width() / 2 - msg.get_width() / 2, screen.get_height() / 2 + title.get_height() / 2))
         screen.blit(sub_msg, (screen.get_width() / 2 - sub_msg.get_width() / 2, screen.get_height() - sub_msg.get_height() - 20))
@@ -180,15 +180,14 @@ def the_end(winner):
                 pygame.quit()
                 quit()
             if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_RETURN:
-                    pygame.quit()
-                    quit()
+                if event.key == pygame.K_q:
+                    return True
                 if event.key == pygame.K_SPACE:
                     score_left = 0
                     score_right = 0
                     bounces = 0
                     waiting = False
-                    return
+                    return True
         clock.tick(60)
 
 # Game Loop 
@@ -307,13 +306,6 @@ def game_loop():
 
         pygame.draw.circle(screen, "white", ball_pos, ball_radius)
 
-        ball_rect = pygame.Rect(
-            ball_pos.x - ball_radius,
-            ball_pos.y - ball_radius,
-            ball_radius * 2,
-            ball_radius * 2
-        )
-
         # Handle ball movement with bounds checking
 
         ball_pos.update(x = ball_pos.x + ball_speed_x * dt, 
@@ -352,20 +344,98 @@ def game_loop():
 
         # Check if the ball collides with one of the players
 
-        if ball_rect.colliderect(rect1) or ball_rect.colliderect(rect2):
-            hit.play()
-            bounces += 1
-            speed = math.hypot(ball_speed_x, ball_speed_y)
-            speed = min(speed + 10, 1200)
-            angle = random.uniform(-45, 45)
-            if ball_rect.colliderect(rect1):
-                ball_pos.x = rect1_x + rect_width + ball_radius + 1
-                ball_speed_x = abs(speed * math.cos(math.radians(angle)))
-                ball_speed_y = speed * math.sin(math.radians(angle))
-            if ball_rect.colliderect(rect2):
-                ball_pos.x = rect2_x - ball_radius - 1
-                ball_speed_x = -abs(speed * math.cos(math.radians(angle)))
-                ball_speed_y = speed * math.sin(math.radians(angle))
+        ball_rect = pygame.Rect(
+            ball_pos.x - ball_radius,
+            ball_pos.y - ball_radius,
+            ball_radius * 2,
+            ball_radius * 2
+        )
+
+        # Check if the ball collides with one of the players
+
+        # --- PADDLE SINISTRO ---
+        if ball_rect.colliderect(rect1) and ball_speed_x < 0:
+
+            # Calcoliamo di quanto la palla "penetra" frontalmente rispetto a verticalmente
+            overlap_left = (rect1_x + rect_width) - (ball_pos.x - ball_radius)
+
+            if ball_pos.y < rect1_y:
+                overlap_y = (ball_pos.y + ball_radius) - rect1_y
+            elif ball_pos.y > rect1_y + rect_height:
+                overlap_y = (rect1_y + rect_height) - (ball_pos.y - ball_radius)
+            else:
+                overlap_y = float('inf')
+
+            # Se l'overlap frontale è minore, è un vero colpo frontale
+            if overlap_left < overlap_y:
+                hit.play()
+                bounces += 1
+
+                speed = math.hypot(ball_speed_x, ball_speed_y)
+                speed = min(speed + 10, 1200)
+                ball_pos.x = rect1_x + rect_width + ball_radius
+
+                center_y = rect1_y + rect_height / 2
+                offset = center_y - ball_pos.y
+                normalized = offset / (rect_height / 2)
+
+                max_angle = math.radians(60)
+                bounce_angle = normalized * max_angle
+
+                ball_speed_x = speed * math.cos(bounce_angle)
+                ball_speed_y = speed * -math.sin(bounce_angle)
+            else:
+                # Colpo sul bordo sopra/sotto (sfioramento)
+                # Rimbalza e fa suono SOLO se la palla sta spingendo contro il paddle
+                if ball_pos.y < rect1_y and ball_speed_y > 0:
+                    hit.play()
+                    ball_pos.y = rect1_y - ball_radius
+                    ball_speed_y = -abs(ball_speed_y)
+                elif ball_pos.y > rect1_y + rect_height and ball_speed_y < 0:
+                    hit.play()
+                    ball_pos.y = rect1_y + rect_height + ball_radius
+                    ball_speed_y = abs(ball_speed_y)
+
+        # --- PADDLE DESTRO ---
+        elif ball_rect.colliderect(rect2) and ball_speed_x > 0:
+
+            overlap_right = (ball_pos.x + ball_radius) - rect2_x
+
+            if ball_pos.y < rect2_y:
+                overlap_y = (ball_pos.y + ball_radius) - rect2_y
+            elif ball_pos.y > rect2_y + rect_height:
+                overlap_y = (rect2_y + rect_height) - (ball_pos.y - ball_radius)
+            else:
+                overlap_y = float('inf')
+
+            if overlap_right < overlap_y:
+                # Colpo frontale
+                hit.play()
+                bounces += 1
+
+                speed = math.hypot(ball_speed_x, ball_speed_y)
+                speed = min(speed + 10, 1200)
+                ball_pos.x = rect2_x - ball_radius
+
+                center_y = rect2_y + rect_height / 2
+                offset = center_y - ball_pos.y
+                normalized = offset / (rect_height / 2)
+
+                max_angle = math.radians(60)
+                bounce_angle = normalized * max_angle
+
+                ball_speed_x = speed * -math.cos(bounce_angle)
+                ball_speed_y = speed * -math.sin(bounce_angle)
+            else:
+                # Colpo sul bordo sopra/sotto (sfioramento)
+                if ball_pos.y < rect2_y and ball_speed_y > 0:
+                    hit.play()
+                    ball_pos.y = rect2_y - ball_radius
+                    ball_speed_y = -abs(ball_speed_y)
+                elif ball_pos.y > rect2_y + rect_height and ball_speed_y < 0:
+                    hit.play()
+                    ball_pos.y = rect2_y + rect_height + ball_radius
+                    ball_speed_y = abs(ball_speed_y)
 
         draw_score()
         draw_bounces()
