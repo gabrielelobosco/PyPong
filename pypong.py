@@ -71,17 +71,17 @@ def main_menu():
         singleplayer = msg_font.render("1 Player", True, "red" if selected == 1 else "white")
         multiplayer = msg_font.render("2 Players", True, "red" if selected == 2 else "white")
         endless = msg_font.render("Endless (1P)", True, "red" if selected == 3 else "white")
-        quit = msg_font.render("Quit", True, "red" if selected == 0 else "white")
+        quit_text = msg_font.render("Quit", True, "red" if selected == 0 else "white")
         
         rect_single = singleplayer.get_rect(center=(screen.get_width()//2, screen.get_height()//2))
         rect_multi  = multiplayer.get_rect(center=(screen.get_width()//2, screen.get_height()//2 + 50))
         rect_endless  = endless.get_rect(center=(screen.get_width()//2, screen.get_height()//2 + 100))
-        rect_quit = quit.get_rect(center=(screen.get_width()//2, screen.get_height()//2 + 200))
+        rect_quit = quit_text.get_rect(center=(screen.get_width()//2, screen.get_height()//2 + 200))
         
         screen.blit(singleplayer, rect_single)
         screen.blit(multiplayer, rect_multi)
         screen.blit(endless, rect_endless)
-        screen.blit(quit, rect_quit)
+        screen.blit(quit_text, rect_quit)
 
         pygame.display.flip()
 
