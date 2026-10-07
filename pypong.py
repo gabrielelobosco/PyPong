@@ -61,24 +61,27 @@ def main_menu():
         title = title_font.render("PyPong", True, "white")
         msg = msg_font.render("Press space to start the game", True, "white")
         created_by = created_by_font.render("A game by: gabrielelobosco", True, "gray")
-        rect_title = title.get_rect(center=(screen.get_width()//2, screen.get_height()//2 - 150))
-        rect_msg = msg.get_rect(center=(screen.get_width()//2, screen.get_height()//2 - 75))
-        
+        rect_title = title.get_rect(center=(screen.get_width()//2, screen.get_height()//2 - 200))
+        rect_msg = msg.get_rect(center=(screen.get_width()//2, screen.get_height()//2 - 125))
+
         screen.blit(title, rect_title)
         screen.blit(msg, rect_msg)
         screen.blit(created_by, (screen.get_width() / 2 - created_by.get_width() / 2, screen.get_height() - created_by.get_height() - 20))
 
         singleplayer = msg_font.render("1 Player", True, "red" if selected == 1 else "white")
         multiplayer = msg_font.render("2 Players", True, "red" if selected == 2 else "white")
-        endless = msg_font.render("Endless (1P)", True, "red" if selected == 0 else "white")
+        endless = msg_font.render("Endless (1P)", True, "red" if selected == 3 else "white")
+        quit = msg_font.render("Quit", True, "red" if selected == 0 else "white")
         
-        rect_single = singleplayer.get_rect(center=(screen.get_width()//2, screen.get_height()//2 + 100))
-        rect_multi  = multiplayer.get_rect(center=(screen.get_width()//2, screen.get_height()//2 + 150))
-        rect_endless  = endless.get_rect(center=(screen.get_width()//2, screen.get_height()//2 + 200))
+        rect_single = singleplayer.get_rect(center=(screen.get_width()//2, screen.get_height()//2))
+        rect_multi  = multiplayer.get_rect(center=(screen.get_width()//2, screen.get_height()//2 + 50))
+        rect_endless  = endless.get_rect(center=(screen.get_width()//2, screen.get_height()//2 + 100))
+        rect_quit = quit.get_rect(center=(screen.get_width()//2, screen.get_height()//2 + 200))
         
         screen.blit(singleplayer, rect_single)
         screen.blit(multiplayer, rect_multi)
         screen.blit(endless, rect_endless)
+        screen.blit(quit, rect_quit)
 
         pygame.display.flip()
 
@@ -88,13 +91,17 @@ def main_menu():
                 quit()
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_SPACE:
-                    start.play()
-                    waiting = False
+                    if selected == 0:
+                        pygame.quit()
+                        quit()
+                    else:
+                        start.play()
+                        waiting = False
                 if event.key == pygame.K_DOWN:
-                    selected = (selected + 1) % 3
+                    selected = (selected + 1) % 4
                     select.play()
                 if event.key == pygame.K_UP:
-                    selected = (selected - 1) % 3
+                    selected = (selected - 1) % 4
                     select.play()
         clock.tick(60)
 
@@ -104,7 +111,7 @@ def pause_menu():
     paused = True
     while paused:
         title = title_font.render("Game Paused", True, "white")
-        msg = msg_font.render("Press esc to continue, canc to quit", True, "white")
+        msg = msg_font.render("Press esc to continue, q to quit", True, "white")
         game_name = created_by_font.render("PyPong", True, "gray")
         screen.blit(title, (screen.get_width() / 2 - title.get_width() / 2, screen.get_height() / 2 - title.get_height() / 2 - msg.get_height() / 2))
         screen.blit(msg, (screen.get_width() / 2 - msg.get_width() / 2, screen.get_height() / 2 + title.get_height() / 2))
@@ -118,10 +125,9 @@ def pause_menu():
                 quit()
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
-                    paused = False
-                if event.key == pygame.K_DELETE:
-                    pygame.quit()
-                    quit()
+                    return False
+                if event.key == pygame.K_q:
+                    return True
                 
         clock.tick(60)
 
@@ -214,6 +220,7 @@ def game_loop():
 
     score_left = 0
     score_right = 0
+    bounces = 0
 
     player_speed = 300
 
@@ -232,7 +239,9 @@ def game_loop():
                 running = False
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
-                    pause_menu()
+                    ritorna_al_menu = pause_menu()
+                    if ritorna_al_menu:
+                        return
 
         if score_left >= points_to_win and score_left > score_right:
             winner = "Left"
